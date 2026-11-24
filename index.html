@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Шахматы: Full Names & Optimized</title>
     
-    <!-- PYSCRIPT -->
-    <link rel="stylesheet" href="https://pyscript.net/releases/2023.05.1/pyscript.css" />
-    <script defer src="https://pyscript.net/releases/2023.05.1/pyscript.js"></script>
+    <!-- ИСПРАВЛЕНО: Стабильная версия PyScript для GitHub Pages -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -193,7 +193,6 @@
         }
 
         function updateUI() {
-            // Полные названия для отображения
             const getName = (v) => {
                 if(v === 'player') return '👤 Игрок';
                 if(v === 'rockkiller') return '🤖 RockKiller';
@@ -251,7 +250,6 @@
                 return; 
             }
 
-            // Попытка хода
             const fr=selected.r, fc=selected.c;
             selected=null; draw();
             await execMove(fr, fc, r, c);
@@ -266,7 +264,7 @@
                 
                 if(res.success) {
                     board = res.board; 
-                    turn = res.turn; // Синхронизация с Python
+                    turn = res.turn;
                     history.push(res.notation);
                     lastMove = {fr,fc,tr,tc};
                     
@@ -403,7 +401,9 @@
         }, 100);
     </script>
 
+    <!-- ИСПРАВЛЕННЫЙ Pyscript: Асинхронная обертка для GitHub Pages -->
     <py-script>
+import asyncio
 import json
 from js import window
 
@@ -616,9 +616,14 @@ class API:
             "is_stalemate":len(om)==0 and not in_check(PY_BOARD,TURN)
         })
 
-window.pyAPI = API()
-init()
-print("Python Chess Engine Loaded")
+# Асинхронная инициализация для GitHub Pages
+async def _init_py():
+    await asyncio.sleep(0.5)
+    window.pyAPI = API()
+    init()
+    print("Python Chess Engine Loaded")
+
+asyncio.ensure_future(_init_py())
     </py-script>
 </body>
 </html>
